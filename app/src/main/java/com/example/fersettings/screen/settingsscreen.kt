@@ -34,7 +34,10 @@ private val profileOptions = listOf("Aspirante", "Becario", "Otro")
 private val educationOptions = listOf("Preparatoria", "Universidad", "Otro")
 
 @Composable
-fun SettingsRoute(viewModel: SettingsViewModel = viewModel()) {
+fun SettingsRoute(
+    viewModel: SettingsViewModel = viewModel(),
+    onNotificationsClick: () -> Unit = {},
+) {
     val prefs by viewModel.prefs.collectAsState()
     val appearance = viewModel.appearanceMode.collectAsState().value
     val context = LocalContext.current
@@ -46,6 +49,7 @@ fun SettingsRoute(viewModel: SettingsViewModel = viewModel()) {
         onEducationChange = viewModel::onEducationChange,
         onAppearanceChange = viewModel::onAppearanceChange,
         onSave = { Toast.makeText(context, "Se guardaron las preferencias", Toast.LENGTH_SHORT).show() },
+        onNotificationsClick = onNotificationsClick,
     )
 }
 
