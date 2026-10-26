@@ -27,6 +27,7 @@ import com.example.fersettings.components.FerTopBar
 import com.example.fersettings.components.RadioQuestion
 import com.example.fersettings.components.SettingsCard
 import com.example.fersettings.components.SettingsRow
+import com.example.fersettings.viewmodel.AppearanceMode
 import com.example.fersettings.viewmodel.SettingsViewModel
 
 private val profileOptions = listOf("Aspirante", "Becario", "Otro")
@@ -35,12 +36,15 @@ private val educationOptions = listOf("Preparatoria", "Universidad", "Otro")
 @Composable
 fun SettingsRoute(viewModel: SettingsViewModel = viewModel()) {
     val prefs by viewModel.prefs.collectAsState()
+    val appearance = viewModel.appearanceMode.collectAsState().value
     val context = LocalContext.current
 
     SettingsScreen(
         prefs = prefs,
+        appearance = appearance,
         onProfileChange = viewModel::onProfileChange,
         onEducationChange = viewModel::onEducationChange,
+        onAppearanceChange = viewModel::onAppearanceChange,
         onSave = { Toast.makeText(context, "Se guardaron las preferencias", Toast.LENGTH_SHORT).show() },
     )
 }
@@ -48,11 +52,12 @@ fun SettingsRoute(viewModel: SettingsViewModel = viewModel()) {
 @Composable
 fun SettingsScreen(
     prefs: ContentPrefs,
+    appearance: AppearanceMode,
     onProfileChange: (String) -> Unit,
     onEducationChange: (String) -> Unit,
     onSave: () -> Unit,
+    onAppearanceChange: (AppearanceMode) -> Unit = {},
     onNotificationsClick: () -> Unit = {},
-    onAppearanceClick: () -> Unit = {},
 ) {
     Scaffold(
         containerColor = colorResource(R.color.bg),
@@ -70,7 +75,18 @@ fun SettingsScreen(
             SettingsCard {
                 SettingsRow(Icons.Outlined.Notifications, "Notificaciones", onNotificationsClick)
                 HorizontalDivider()
-                SettingsRow(Icons.Outlined.DarkMode, "Apariencia", onAppearanceClick)
+                RadioQuestion(
+                    icon = Icons.Outlined.DarkMode,
+                    title = "Apariencia",
+                    subtitle = "Elige como quieres ver la aplicación",
+                    options = AppearanceMode.entries.map { it.label },
+                    selected = appearance.label,
+                    onSelect = { label ->
+                        AppearanceMode.entries
+                            .first { it.label == label }
+                            .let(onAppearanceChange)
+                    },
+                )
             }
 
             Text(
